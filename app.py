@@ -1,7 +1,20 @@
-import streamlit as st
-import cv2
-import numpy as np
+# ==============================================================================
+# KODE FINAL STREAMLIT (ANTI-ERROR OPENCV)
+# ==============================================================================
+import subprocess
+import sys
 import os
+
+# 1. PAKSA INSTALASI OPENCV HEADLESS (Mengatasi error libGL)
+try:
+    import cv2
+except ImportError:
+    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless"], check=False, capture_output=True)
+    subprocess.run([sys.executable, "-m", "pip", "install", "--no-cache-dir", "opencv-python-headless"], check=False, capture_output=True)
+    import cv2
+
+import streamlit as st
+import numpy as np
 import re
 import math
 import easyocr
@@ -14,10 +27,19 @@ from PIL import Image
 # KONFIGURASI HALAMAN & API KEY
 # ==========================================
 st.set_page_config(page_title="AI Blueprint Analyzer", layout="wide")
-GROQ_API_KEY = st.secrets["GROQ_API_KEY"] 
+
+# Mengambil API Key dari Streamlit Secrets
+if "GROQ_API_KEY" in st.secrets:
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+else:
+    st.error("API Key Groq tidak ditemukan di Streamlit Secrets!")
+    GROQ_API_KEY = ""
+
 client = Groq(api_key=GROQ_API_KEY)
 
-# Inisialisasi Model (Menggunakan Cache agar tidak loading berulang)
+# ==========================================
+# LOAD MODEL (Menggunakan Cache)
+# ==========================================
 @st.cache_resource
 def load_models():
     model_visual = YOLO('model_visual.pt')
@@ -25,9 +47,15 @@ def load_models():
     reader = easyocr.Reader(['en'], gpu=False)
     return model_visual, model_teks, reader
 
-model_visual, model_teks, reader = load_models()
+try:
+    model_visual, model_teks, reader = load_models()
+except Exception as e:
+    st.error(f"Gagal memuat model: {e}")
+    st.stop()
 
-# Inisialisasi Session State (Menyimpan memori aplikasi)
+# ==========================================
+# INISIALISASI SESSION STATE
+# ==========================================
 if 'state' not in st.session_state:
     st.session_state.state = {
         "img": None, "count_wall": 0, "count_door": 0, "count_window": 0,
@@ -222,7 +250,6 @@ with tab3:
     st.write("### Diskusi dengan AI Teknisi")
     st.info("Tanyakan sesuatu tentang denah yang sudah diproses, seperti: 'Tolong buatkan tabel luas ruangan' atau 'Berapa keliling acuan bangunan?'")
     
-    # Tampilkan riwayat chat
     if st.session_state.chat_history:
         st.markdown(st.session_state.chat_history)
         
@@ -234,4 +261,4 @@ with tab3:
             with st.spinner("AI sedang berpikir..."):
                 jawaban = tanya_ai(user_input)
                 st.session_state.chat_history += f"👤 **Anda:**\n{user_input}\n\n🤖 **AI:**\n{jawaban}\n\n---\n\n"
-                st.rerun() # Refresh halaman agar chat baru muncul
+                st.rerun()
