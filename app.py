@@ -2,7 +2,7 @@ import subprocess
 import sys
 
 # ==============================================================================
-# TRIK PAKSA INSTALASI OPENCV HEADLESS (MENGATASI SERVER STREAMLIT ERROR)
+# TRIK PAKSA INSTALASI OPENCV HEADLESS (MENGATASI BUG SERVER STREAMLIT)
 # ==============================================================================
 try:
     import cv2
