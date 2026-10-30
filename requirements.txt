@@ -1,0 +1,7 @@
+streamlit
+ultralytics
+easyocr
+opencv-python-headless
+scikit-learn
+groq
+Pillow
