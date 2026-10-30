@@ -1,7 +1,7 @@
+opencv-python-headless==4.8.0.74
 streamlit
 ultralytics
 easyocr
-opencv-python-headless
 scikit-learn
 groq
 Pillow
