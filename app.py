@@ -1,15 +1,15 @@
-# ==============================================================================
-# KODE FINAL STREAMLIT (ANTI-ERROR OPENCV)
-# ==============================================================================
 import subprocess
 import sys
-import os
 
-# 1. PAKSA INSTALASI OPENCV HEADLESS (Mengatasi error libGL)
+# ==============================================================================
+# TRIK PAKSA INSTALASI OPENCV HEADLESS (Mengatasi Error libGL)
+# ==============================================================================
 try:
     import cv2
 except ImportError:
-    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless"], check=False, capture_output=True)
+    # Hapus semua versi opencv yang mungkin terinstal
+    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless", "opencv-contrib-python"], check=False, capture_output=True)
+    # Instal versi headless secara paksa
     subprocess.run([sys.executable, "-m", "pip", "install", "--no-cache-dir", "opencv-python-headless"], check=False, capture_output=True)
     import cv2
 
@@ -28,7 +28,6 @@ from PIL import Image
 # ==========================================
 st.set_page_config(page_title="AI Blueprint Analyzer", layout="wide")
 
-# Mengambil API Key dari Streamlit Secrets
 if "GROQ_API_KEY" in st.secrets:
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 else:
@@ -38,7 +37,7 @@ else:
 client = Groq(api_key=GROQ_API_KEY)
 
 # ==========================================
-# LOAD MODEL (Menggunakan Cache)
+# LOAD MODEL
 # ==========================================
 @st.cache_resource
 def load_models():
