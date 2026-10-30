@@ -1,5 +1,19 @@
+import subprocess
+import sys
+
+# ==============================================================================
+# TRIK PAKSA INSTALASI OPENCV HEADLESS (MENGATASI SERVER STREAMLIT ERROR)
+# ==============================================================================
+try:
+    import cv2
+except ImportError:
+    # Hapus semua versi opencv yang mungkin terinstal
+    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless", "opencv-contrib-python"], check=False, capture_output=True)
+    # Instal versi headless secara paksa
+    subprocess.run([sys.executable, "-m", "pip", "install", "--no-cache-dir", "opencv-python-headless==4.8.0.74"], check=False, capture_output=True)
+    import cv2
+
 import streamlit as st
-import cv2
 import numpy as np
 import re
 import math
